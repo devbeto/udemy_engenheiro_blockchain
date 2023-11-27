@@ -77,8 +77,17 @@ class Blockchain:
         longest_chain = None
         max_length = len(self.chain)
         for node in network:
-            response = requests.get('http://127.0.0.1:5000/')
-        
+            response = requests.get(f'http://{node}/get_chain')
+            if response.status_code == 200:
+                lenght = response.json()['lenght']
+                chain = response.json()['chain']
+                if lenght > max_length and self.is_chain_valid(chain):
+                    max_length = lenght
+                    longest_chain = chain
+        if longest_chain:
+            self.chain = longest_chain
+            return True        
+        return False
 
 app = Flask(__name__)
 app.config['JSONIFY_PRETTYPRINT_REGULAR'] = False
